@@ -64,6 +64,7 @@
       ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
     ];
     let currentText = "";
+    let isSpinning = false; // スロットが回転中かどうかを示すフラグ
 
     const accelerationDisplay = document.getElementById('accelerationDisplay');
     const requestPermissionButton = document.getElementById('requestPermission');
@@ -104,10 +105,24 @@
       currentText = modeItems[mode][index];
     }
 
+    // スロットを回す
     spinButton.onclick = () => {
-      if (currentMode === 'slot') updateSlotItem();
+      if (currentMode === 'slot' && !isSpinning) {
+        isSpinning = true;
+        let spinDuration = 2000; // 回転時間をミリ秒で設定
+        let spinInterval = 100; // 回転速度を設定
+
+        const spinAnimation = setInterval(updateSlotItem, spinInterval);
+
+        setTimeout(() => {
+          clearInterval(spinAnimation);
+          updateSlotItem(); // 最終の結果を表示
+          isSpinning = false;
+        }, spinDuration);
+      }
     };
-    
+
+    // モードを切り替える
     changeModeButton.onclick = () => {
       mode = (mode + 1) % 2;
       updateSlotItem();
