@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スロット＆加速度センサー</title>
+  <title>スロットマシン＆加速度センサー</title>
   <style>
     body {
       display: flex;
@@ -13,7 +13,15 @@
       height: 100vh;
       margin: 0;
     }
-    canvas {
+    #slotCanvas {
+      border: 2px solid #000;
+      width: 300px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background-color: #f0f0f0;
       margin-top: 20px;
     }
     button {
@@ -35,6 +43,9 @@
   <!-- モード切り替えボタン -->
   <button id="toggleMode">加速度センサーモードに切り替え</button>
 
+  <!-- スロット表示エリア -->
+  <div id="slotCanvas">スロット結果</div>
+
   <!-- スロットボタン -->
   <button id="spinButton">回す</button>
   <button id="changeModeButton">モード</button>
@@ -51,21 +62,21 @@
   </div>
 
   <script>
-    // 初期設定
-    let currentMode = 'slot'; // 'slot' or 'accelerometer'
+    let currentMode = 'slot';
     const threshold = 0.9;
     let audio = new Audio('alert-sound.mp3');
     let lastAcceleration = { x: 0, y: 0, z: 0 };
     let intervalId;
     let isMeasuring = false;
-    let mode = 1; 
+    let mode = 0;
     let modeItems = [
       ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
       ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
     ];
     let currentText = "";
-    let isSpinning = false; // スロットが回転中かどうかを示すフラグ
+    let isSpinning = false;
 
+    const slotCanvas = document.getElementById('slotCanvas');
     const accelerationDisplay = document.getElementById('accelerationDisplay');
     const requestPermissionButton = document.getElementById('requestPermission');
     const stopMeasurementButton = document.getElementById('stopMeasurement');
@@ -78,57 +89,33 @@
     const changeModeButton = document.getElementById('changeModeButton');
     const title = document.getElementById('title');
 
-    function setup() {
-      createCanvas(300, 150).parent(document.body);
-      textSize(24);
-      textAlign(CENTER, CENTER);
-      updateSlotItem();
-    }
-
-    function draw() {
-      if (currentMode === 'slot') {
-        background(255);
-        fill(200);
-        rect(width / 2 - 150, height / 2 - 50, 300, 100);
-        fill(0);
-        text(currentText, width / 2, height / 2);
-
-        title.innerText = "スロットマシン";
-        spinButton.style.display = 'inline';
-        changeModeButton.style.display = 'inline';
-        accelerationDisplay.style.display = 'none';
-      }
-    }
-
     function updateSlotItem() {
-      let index = int(random(modeItems[mode].length));
+      let index = Math.floor(Math.random() * modeItems[mode].length);
       currentText = modeItems[mode][index];
+      slotCanvas.innerText = currentText; // スロット結果を表示
     }
 
-    // スロットを回す
     spinButton.onclick = () => {
       if (currentMode === 'slot' && !isSpinning) {
         isSpinning = true;
-        let spinDuration = 2000; // 回転時間をミリ秒で設定
-        let spinInterval = 100; // 回転速度を設定
+        let spinDuration = 2000;
+        let spinInterval = 100;
 
         const spinAnimation = setInterval(updateSlotItem, spinInterval);
 
         setTimeout(() => {
           clearInterval(spinAnimation);
-          updateSlotItem(); // 最終の結果を表示
+          updateSlotItem();
           isSpinning = false;
         }, spinDuration);
       }
     };
 
-    // モードを切り替える
     changeModeButton.onclick = () => {
       mode = (mode + 1) % 2;
       updateSlotItem();
     };
 
-    // モード切り替え
     toggleModeButton.onclick = () => {
       if (currentMode === 'slot') {
         currentMode = 'accelerometer';
@@ -197,3 +184,4 @@
   </script>
 </body>
 </html>
+
