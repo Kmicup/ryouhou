@@ -35,6 +35,10 @@
       display: none;
       text-align: center;
     }
+    #modeDisplay {
+      font-size: 1.2em;
+      margin: 10px;
+    }
   </style>
 </head>
 <body>
@@ -45,10 +49,11 @@
 
   <!-- スロット表示エリア -->
   <div id="slotCanvas">スロット結果</div>
+  <div id="modeDisplay">現在のモード: ご褒美モード</div>
 
   <!-- スロットボタン -->
   <button id="spinButton">回す</button>
-  <button id="changeModeButton">モード</button>
+  <button id="changeModeButton">モード切り替え</button>
 
   <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
@@ -73,6 +78,7 @@
       ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
       ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
     ];
+    let modeNames = ["ご褒美モード", "ペナルティモード"];
     let currentText = "";
     let isSpinning = false;
 
@@ -87,12 +93,12 @@
     const toggleModeButton = document.getElementById('toggleMode');
     const spinButton = document.getElementById('spinButton');
     const changeModeButton = document.getElementById('changeModeButton');
-    const title = document.getElementById('title');
+    const modeDisplay = document.getElementById('modeDisplay');
 
     function updateSlotItem() {
       let index = Math.floor(Math.random() * modeItems[mode].length);
       currentText = modeItems[mode][index];
-      slotCanvas.innerText = currentText; // スロット結果を表示
+      slotCanvas.innerText = currentText;
     }
 
     spinButton.onclick = () => {
@@ -113,6 +119,7 @@
 
     changeModeButton.onclick = () => {
       mode = (mode + 1) % 2;
+      modeDisplay.innerText = "現在のモード: " + modeNames[mode];
       updateSlotItem();
     };
 
@@ -120,15 +127,19 @@
       if (currentMode === 'slot') {
         currentMode = 'accelerometer';
         toggleModeButton.innerText = "スロットモードに切り替え";
+        slotCanvas.style.display = 'none';
         spinButton.style.display = 'none';
         changeModeButton.style.display = 'none';
+        modeDisplay.style.display = 'none';
         accelerationDisplay.style.display = 'block';
       } else {
         currentMode = 'slot';
         toggleModeButton.innerText = "加速度センサーモードに切り替え";
-        accelerationDisplay.style.display = 'none';
+        slotCanvas.style.display = 'flex';
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
+        modeDisplay.style.display = 'block';
+        accelerationDisplay.style.display = 'none';
       }
     };
 
@@ -184,4 +195,3 @@
   </script>
 </body>
 </html>
-
