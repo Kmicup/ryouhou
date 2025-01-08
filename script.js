@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let isMeasuring = false;
   let lastAcceleration = { x: 0, y: 0, z: 0 };
   let measurementInterval;
-  const threshold = 1.0;
-  const audio = new Audio('alert-sound.mp3');
 
   // UI要素の取得
   const toggleModeButton = document.getElementById('toggleMode');
@@ -16,10 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const requestPermissionButton = document.getElementById('requestPermission');
   const stopMeasurementButton = document.createElement('button');
   const countdownDisplay = document.createElement('p');
-  const accelerationX = document.getElementById('accelerationX');
-  const accelerationY = document.getElementById('accelerationY');
-  const accelerationZ = document.getElementById('accelerationZ');
-  const totalAcceleration = document.getElementById('totalAcceleration');
 
   stopMeasurementButton.innerText = "計測を停止";
   stopMeasurementButton.style.display = 'none';
@@ -31,21 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentMode === 'slot') {
       currentMode = 'accelerometer';
       toggleModeButton.innerText = "スロットモードに切り替え";
-      slotCanvas.style.display = 'none';
-      spinButton.style.display = 'none';
-      changeModeButton.style.display = 'none';
-      modeDisplay.style.display = 'none';
-      accelerationDisplay.style.display = 'block';
+      slotCanvas.style.visibility = 'hidden';
+      spinButton.style.visibility = 'hidden';
+      changeModeButton.style.visibility = 'hidden';
+      modeDisplay.style.visibility = 'hidden';
+      accelerationDisplay.style.visibility = 'visible';
+      accelerationDisplay.style.opacity = '1';
     } else {
       currentMode = 'slot';
       toggleModeButton.innerText = "加速度センサーモードに切り替え";
-      slotCanvas.style.display = 'flex';
-      spinButton.style.display = 'inline';
-      changeModeButton.style.display = 'inline';
-      modeDisplay.style.display = 'block';
-      accelerationDisplay.style.display = 'none';
+      slotCanvas.style.visibility = 'visible';
+      spinButton.style.visibility = 'visible';
+      changeModeButton.style.visibility = 'visible';
+      modeDisplay.style.visibility = 'visible';
+      accelerationDisplay.style.visibility = 'hidden';
+      accelerationDisplay.style.opacity = '0';
       stopMeasurement();
     }
+  };
+
+  // スロットの回転処理
+  spinButton.onclick = () => {
+    if (currentMode !== 'slot') return;
+    alert('スロット回転！');  // デバッグ用
   };
 
   // 加速度センサーの計測を開始
