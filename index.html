@@ -207,7 +207,15 @@
           accelerationZ.textContent = z.toFixed(2);
           totalAcceleration.textContent = totalAccel.toFixed(2);
 
-          if (totalAccel < threshold) audio.play();
+          // 総合加速度が1.0未満なら音を鳴らし、それ以外の場合は音を止める
+          if (totalAccel < 1.0) {
+            if (audio.paused) {
+              audio.play();
+            }
+          } else {
+            audio.pause();
+            audio.currentTime = 0;
+          }
         }, 200);
         isMeasuring = true;
         stopMeasurementButton.style.display = 'inline';
