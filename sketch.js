@@ -1,119 +1,73 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スロットマシン＆加速度センサー</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: #000;
-      color: #fff;
+document.addEventListener('DOMContentLoaded', () => {
+  let currentMode = 'slot'; // 初期モードはスロット
+  let mode = 0; // モードのインデックス (0: ご褒美モード, 1: ペナルティモード)
+  let modeItems = [
+    ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
+    ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
+  ];
+  let modeNames = ["ご褒美モード", "ペナルティモード"];
+  let isSpinning = false;
+
+  // 要素を取得
+  const toggleModeButton = document.getElementById('toggleMode');
+  const slotCanvas = document.getElementById('slotCanvas');
+  const spinButton = document.getElementById('spinButton');
+  const changeModeButton = document.getElementById('changeModeButton');
+  const accelerationDisplay = document.getElementById('accelerationDisplay');
+  const modeDisplay = document.getElementById('modeDisplay');
+
+  // スロットのアイテムをランダムに更新
+  function updateSlotItem() {
+    const index = Math.floor(Math.random() * modeItems[mode].length);
+    slotCanvas.innerText = modeItems[mode][index];
+  }
+
+  // スロットボタンの動作
+  spinButton.onclick = () => {
+    if (currentMode === 'slot' && !isSpinning) {
+      isSpinning = true;
+      const spinDuration = 2000; // スロットの回転時間
+      const spinInterval = 100; // スロットの更新間隔
+
+      const spinAnimation = setInterval(updateSlotItem, spinInterval);
+
+      setTimeout(() => {
+        clearInterval(spinAnimation);
+        updateSlotItem();
+        isSpinning = false;
+      }, spinDuration);
     }
+  };
 
-    #slotCanvas {
-      border: 4px solid #ffea00;
-      width: 300px;
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #000;
-      background: #ffea00;
-      margin-top: 20px;
-      box-shadow: 0 8px 15px rgba(255, 234, 0, 0.5);
-      border-radius: 10px;
+  // モード切り替えボタンの動作
+  changeModeButton.onclick = () => {
+    mode = (mode + 1) % 2;
+    modeDisplay.innerText = "現在のモード: " + modeNames[mode];
+    updateSlotItem();
+  };
+
+  // UIモード切り替えボタンの動作
+  toggleModeButton.onclick = () => {
+    if (currentMode === 'slot') {
+      currentMode = 'accelerometer';
+      toggleModeButton.innerText = "スロットモードに切り替え";
+      slotCanvas.style.display = 'none';
+      spinButton.style.display = 'none';
+      changeModeButton.style.display = 'none';
+      modeDisplay.style.display = 'none';
+      accelerationDisplay.classList.add('show');
+    } else {
+      currentMode = 'slot';
+      toggleModeButton.innerText = "加速度センサーモードに切り替え";
+      slotCanvas.style.display = 'flex';
+      spinButton.style.display = 'inline';
+      changeModeButton.style.display = 'inline';
+      modeDisplay.style.display = 'block';
+      accelerationDisplay.classList.remove('show');
     }
+  };
 
-    button {
-      font-size: 1.2em;
-      padding: 10px 25px;
-      margin: 10px;
-      border-radius: 25px;
-      background: #007bff;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
-    }
-
-    #accelerationDisplay {
-      visibility: hidden; /* 非表示にする */
-      position: absolute;
-      opacity: 0;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    #accelerationDisplay.show {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    #modeDisplay {
-      font-size: 1.2em;
-      margin: 10px;
-      color: #007bff;
-    }
-  </style>
-</head>
-<body>
-  <h1 id="title">スロットマシン</h1>
-  <button id="toggleMode">加速度センサーモードに切り替え</button>
-  <div id="slotCanvas">スロット結果</div>
-  <div id="modeDisplay">現在のモード: ご褒美モード</div>
-  <button id="spinButton">回す</button>
-  <button id="changeModeButton">モード切り替え</button>
-  <div id="accelerationDisplay">
-    <p>加速度センサー検知</p>
-    <p>X軸加速度: <span id="accelerationX">0</span></p>
-  </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let currentMode = 'slot';
-
-      const toggleModeButton = document.getElementById('toggleMode');
-      const accelerationDisplay = document.getElementById('accelerationDisplay');
-      const slotCanvas = document.getElementById('slotCanvas');
-      const spinButton = document.getElementById('spinButton');
-      const changeModeButton = document.getElementById('changeModeButton');
-
-      toggleModeButton.onclick = () => {
-        if (currentMode === 'slot') {
-          currentMode = 'accelerometer';
-          toggleModeButton.innerText = "スロットモードに切り替え";
-          slotCanvas.style.display = 'none';
-          spinButton.style.display = 'none';
-          changeModeButton.style.display = 'none';
-          accelerationDisplay.classList.add('show');
-        } else {
-          currentMode = 'slot';
-          toggleModeButton.innerText = "加速度センサーモードに切り替え";
-          slotCanvas.style.display = 'flex';
-          spinButton.style.display = 'inline';
-          changeModeButton.style.display = 'inline';
-          accelerationDisplay.classList.remove('show');
-        }
-      };
-
-      spinButton.onclick = () => {
-        alert('スロットを回す！');
-      };
-
-      changeModeButton.onclick = () => {
-        alert('モードを切り替え！');
-      };
-    });
-  </script>
-</body>
-</html>
+  // 初期設定
+  modeDisplay.innerText = "現在のモード: " + modeNames[mode];
+  updateSlotItem();
+});
