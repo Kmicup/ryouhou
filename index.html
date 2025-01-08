@@ -157,6 +157,20 @@
       }
     };
 
+    requestPermissionButton.onclick = async () => {
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        // iOSの場合、加速度センサーの許可を求める
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission === 'granted') {
+          startMeasurement();
+        } else {
+          alert('加速度センサーのアクセスが許可されていません。');
+        }
+      } else {
+        startMeasurement(); // Androidなど、すでに許可されている場合
+      }
+    };
+
     function startSlotSpin() {
       spinButton.disabled = true; // ボタンを無効化
       const spinDuration = 3000; // スロットをランダムに表示する時間（ミリ秒）
@@ -177,10 +191,6 @@
         updateSlotItem(); // 最終的な結果を表示
       }, spinDuration);
     }
-
-    requestPermissionButton.onclick = () => {
-      startMeasurement();
-    };
 
     function startMeasurement() {
       setTimeout(() => {
