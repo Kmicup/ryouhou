@@ -48,24 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // UIモード切り替えボタンの動作
   toggleModeButton.onclick = () => {
-    if (currentMode === 'slot') {
-      currentMode = 'accelerometer';
-      toggleModeButton.innerText = "スロットモードに切り替え";
-      slotCanvas.style.display = 'none';
-      spinButton.style.display = 'none';
-      changeModeButton.style.display = 'none';
-      modeDisplay.style.display = 'none';
-      accelerationDisplay.classList.add('show');
-    } else {
-      currentMode = 'slot';
-      toggleModeButton.innerText = "加速度センサーモードに切り替え";
-      slotCanvas.style.display = 'flex';
-      spinButton.style.display = 'inline';
-      changeModeButton.style.display = 'inline';
-      modeDisplay.style.display = 'block';
-      accelerationDisplay.classList.remove('show');
-    }
-  };
+  if (currentMode === 'slot') {
+    // スロットモード → 加速度センサーモードに切り替え
+    currentMode = 'accelerometer';
+    toggleModeButton.innerText = "スロットモードに切り替え";
+    slotCanvas.style.display = 'none';
+    spinButton.style.display = 'none';
+    changeModeButton.style.display = 'none';
+    modeDisplay.style.display = 'none';
+    accelerationDisplay.style.display = 'block'; // 表示切り替え
+  } else {
+    // 加速度センサーモード → スロットモードに切り替え
+    currentMode = 'slot';
+    toggleModeButton.innerText = "加速度センサーモードに切り替え";
+    slotCanvas.style.display = 'flex';
+    spinButton.style.display = 'inline';
+    changeModeButton.style.display = 'inline';
+    modeDisplay.style.display = 'block';
+    accelerationDisplay.style.display = 'none'; // 非表示
+  }
+};
 
   // 初期設定
   modeDisplay.innerText = "現在のモード: " + modeNames[mode];
