@@ -96,9 +96,6 @@
     const changeModeButton = document.getElementById('changeModeButton');
     const title = document.getElementById('title');
 
-    let countdownInterval;
-    let countdownTime = 3; // 3秒のカウントダウン
-
     function setup() {
       createCanvas(300, 200); // コンパクトなサイズに設定
       textSize(18); // 文字サイズを調整
@@ -182,25 +179,8 @@
     }
 
     requestPermissionButton.onclick = () => {
-      startCountdown();
+      startMeasurement();
     };
-
-    function startCountdown() {
-      countdownTime = 3; // 3秒にリセット
-      requestPermissionButton.textContent = `${countdownTime}秒後に計測開始`;
-
-      // カウントダウン処理
-      countdownInterval = setInterval(() => {
-        countdownTime--;
-        requestPermissionButton.textContent = `${countdownTime}秒後に計測開始`;
-
-        if (countdownTime <= 0) {
-          clearInterval(countdownInterval); // カウントダウン終了
-          requestPermissionButton.textContent = "計測開始";
-          startMeasurement();
-        }
-      }, 1000);
-    }
 
     function startMeasurement() {
       setTimeout(() => {
@@ -221,7 +201,7 @@
         }, 200);
         isMeasuring = true;
         stopMeasurementButton.style.display = 'inline';
-      }, 2000);
+      }, 2000); // 2秒後に計測開始
       requestPermissionButton.style.display = 'none';
     }
 
@@ -247,4 +227,3 @@
   </script>
 </body>
 </html>
-
