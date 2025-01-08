@@ -14,20 +14,50 @@
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
+      background-color: #111; /* 黒背景 */
+      color: white;
     }
     canvas {
-      margin-top: 10px;
+      margin-top: 20px;
     }
     button {
-      font-size: 1em;
-      padding: 8px 16px;
-      margin: 5px;
-      border-radius: 6px;
+      font-size: 1.2em;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 10px;
       cursor: pointer;
+      background: linear-gradient(45deg, #00aaff, #ffcc00); /* 青と黄色のグラデーション */
+      border: none;
+      color: black;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(45deg, #ffcc00, #00aaff);
+      transform: scale(1.1);
     }
     #accelerationDisplay {
       display: none;
       text-align: center;
+    }
+    #title {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #f0f0f0;
+      text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
+    }
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      width: 2px;
+      height: 2px;
+      animation: twinkle 1.5s infinite alternate;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
   </style>
 </head>
@@ -84,12 +114,14 @@
       textSize(18); // 文字サイズを調整
       textAlign(CENTER, CENTER);
       updateSlotItem();
+      createStars(); // 星を作成
     }
 
     function draw() {
       if (currentMode === 'slot') {
         // スロットモードの場合、スロットを表示
-        background(255);
+        background(0); // 夜空の背景
+        drawStars(); // 星を表示
         fill(200);
         rect(width / 2 - 120, height / 2 - 40, 240, 80); // 小さめのスロット矩形
         fill(0);
@@ -159,6 +191,25 @@
       spinTimeout = setTimeout(() => {
         updateSlotItem(); // 最終的な結果を表示
       }, spinDuration);
+    }
+
+    function createStars() {
+      for (let i = 0; i < 100; i++) {
+        let star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = `${Math.random() * window.innerWidth}px`;
+        star.style.top = `${Math.random() * window.innerHeight}px`;
+        document.body.appendChild(star);
+      }
+    }
+
+    function drawStars() {
+      // 星のアニメーションを作るためのコード
+      let stars = document.getElementsByClassName('star');
+      Array.from(stars).forEach(star => {
+        const opacity = Math.random() * 0.8 + 0.2;
+        star.style.opacity = opacity;
+      });
     }
 
     requestPermissionButton.onclick = async () => {
