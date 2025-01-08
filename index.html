@@ -46,19 +46,6 @@
       color: #f0f0f0;
       text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
     }
-    .star {
-      position: absolute;
-      background-color: white;
-      border-radius: 50%;
-      width: 2px;
-      height: 2px;
-      animation: twinkle 1.5s infinite alternate;
-    }
-    @keyframes twinkle {
-      0% { opacity: 0.8; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
-    }
   </style>
 </head>
 <body>
@@ -74,7 +61,7 @@
   <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
     <p>加速度センサー検知</p>
-    <button id="requestPermission">2秒後に計測開始</button>
+    <button id="requestPermission">計測開始までのカウントダウン</button>
     <button id="stopMeasurement" style="display: none;">計測と音を止める</button>
     <p>X軸加速度: <span id="accelerationX">0</span></p>
     <p>Y軸加速度: <span id="accelerationY">0</span></p>
@@ -109,19 +96,20 @@
     const changeModeButton = document.getElementById('changeModeButton');
     const title = document.getElementById('title');
 
+    let countdownInterval;
+    let countdownTime = 3; // 3秒のカウントダウン
+
     function setup() {
       createCanvas(300, 200); // コンパクトなサイズに設定
       textSize(18); // 文字サイズを調整
       textAlign(CENTER, CENTER);
       updateSlotItem();
-      createStars(); // 星を作成
     }
 
     function draw() {
       if (currentMode === 'slot') {
         // スロットモードの場合、スロットを表示
         background(0); // 夜空の背景
-        drawStars(); // 星を表示
         fill(200);
         rect(width / 2 - 120, height / 2 - 40, 240, 80); // 小さめのスロット矩形
         fill(0);
@@ -193,31 +181,26 @@
       }, spinDuration);
     }
 
-    function createStars() {
-      for (let i = 0; i < 100; i++) {
-        let star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = `${Math.random() * window.innerWidth}px`;
-        star.style.top = `${Math.random() * window.innerHeight}px`;
-        document.body.appendChild(star);
-      }
-    }
-
-    function drawStars() {
-      // 星のアニメーションを作るためのコード
-      let stars = document.getElementsByClassName('star');
-      Array.from(stars).forEach(star => {
-        const opacity = Math.random() * 0.8 + 0.2;
-        star.style.opacity = opacity;
-      });
-    }
-
-    requestPermissionButton.onclick = async () => {
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        const permission = await DeviceMotionEvent.requestPermission();
-        if (permission === 'granted') startMeasurement();
-      } else startMeasurement();
+    requestPermissionButton.onclick = () => {
+      startCountdown();
     };
+
+    function startCountdown() {
+      countdownTime = 3; // 3秒にリセット
+      requestPermissionButton.textContent = `${countdownTime}秒後に計測開始`;
+
+      // カウントダウン処理
+      countdownInterval = setInterval(() => {
+        countdownTime--;
+        requestPermissionButton.textContent = `${countdownTime}秒後に計測開始`;
+
+        if (countdownTime <= 0) {
+          clearInterval(countdownInterval); // カウントダウン終了
+          requestPermissionButton.textContent = "計測開始";
+          startMeasurement();
+        }
+      }, 1000);
+    }
 
     function startMeasurement() {
       setTimeout(() => {
