@@ -13,15 +13,16 @@
       justify-content: center;
       height: 100vh;
       margin: 0;
+      font-family: Arial, sans-serif;
     }
     canvas {
-      margin-top: 20px;
+      margin-top: 10px;
     }
     button {
-      font-size: 1.2em;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 8px;
+      font-size: 1em;
+      padding: 8px 16px;
+      margin: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
     #accelerationDisplay {
@@ -52,7 +53,6 @@
   </div>
 
   <script>
-    // 初期設定
     let currentMode = 'slot'; // 'slot' or 'accelerometer'
     const threshold = 0.9;
     let audio = new Audio('alert-sound.mp3');
@@ -79,8 +79,8 @@
     const title = document.getElementById('title');
 
     function setup() {
-      createCanvas(windowWidth, windowHeight);  // キャンバスを画面全体に合わせる
-      textSize(24);  // 文字サイズ
+      createCanvas(300, 200); // コンパクトなサイズに設定
+      textSize(18); // 文字サイズを調整
       textAlign(CENTER, CENTER);
       updateSlotItem();
     }
@@ -89,9 +89,9 @@
       if (currentMode === 'slot') {
         background(255);
         fill(200);
-        rect(width / 2 - 150, height / 2 - 50, 300, 100); // スロットの矩形
+        rect(width / 2 - 120, height / 2 - 40, 240, 80); // 小さめのスロット矩形
         fill(0);
-        text(currentText, width / 2, height / 2); // スロット内のテキスト
+        text(currentText, width / 2, height / 2); // スロット内容
 
         title.innerText = "スロットマシン";
         spinButton.style.display = 'inline';
@@ -183,4 +183,3 @@
   </script>
 </body>
 </html>
-
