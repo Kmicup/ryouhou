@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スロット＆加速度センサー</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- p5.jsライブラリ -->
   <style>
     body {
       display: flex;
@@ -78,8 +79,8 @@
     const title = document.getElementById('title');
 
     function setup() {
-      createCanvas(300, 150).parent(document.body);
-      textSize(24);
+      createCanvas(windowWidth, windowHeight);  // キャンバスを画面全体に合わせる
+      textSize(24);  // 文字サイズ
       textAlign(CENTER, CENTER);
       updateSlotItem();
     }
@@ -88,9 +89,9 @@
       if (currentMode === 'slot') {
         background(255);
         fill(200);
-        rect(width / 2 - 150, height / 2 - 50, 300, 100);
+        rect(width / 2 - 150, height / 2 - 50, 300, 100); // スロットの矩形
         fill(0);
-        text(currentText, width / 2, height / 2);
+        text(currentText, width / 2, height / 2); // スロット内のテキスト
 
         title.innerText = "スロットマシン";
         spinButton.style.display = 'inline';
@@ -182,3 +183,4 @@
   </script>
 </body>
 </html>
+
