@@ -88,6 +88,7 @@
 
     function draw() {
       if (currentMode === 'slot') {
+        // スロットモードの場合、スロットを表示
         background(255);
         fill(200);
         rect(width / 2 - 120, height / 2 - 40, 240, 80); // 小さめのスロット矩形
@@ -99,9 +100,10 @@
         changeModeButton.style.display = 'inline';
         accelerationDisplay.style.display = 'none';
       } else {
-        spinButton.style.display = 'none';  // 加速度センサーモードではスロットを非表示
-        changeModeButton.style.display = 'none';
-        accelerationDisplay.style.display = 'block';
+        // 加速度センサーモードの場合、スロットを非表示にする
+        spinButton.style.display = 'none';  // スロットボタン非表示
+        changeModeButton.style.display = 'none'; // モード切り替えボタン非表示
+        accelerationDisplay.style.display = 'block'; // 加速度センサー表示
       }
     }
 
