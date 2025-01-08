@@ -65,6 +65,7 @@
       ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
     ];
     let currentText = "";
+    let spinTimeout; // スロットの回転に関するタイマー
 
     const accelerationDisplay = document.getElementById('accelerationDisplay');
     const requestPermissionButton = document.getElementById('requestPermission');
@@ -97,6 +98,10 @@
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
         accelerationDisplay.style.display = 'none';
+      } else {
+        spinButton.style.display = 'none';  // 加速度センサーモードではスロットを非表示
+        changeModeButton.style.display = 'none';
+        accelerationDisplay.style.display = 'block';
       }
     }
 
@@ -106,9 +111,11 @@
     }
 
     spinButton.onclick = () => {
-      if (currentMode === 'slot') updateSlotItem();
+      if (currentMode === 'slot') {
+        startSlotSpin();
+      }
     };
-    
+
     changeModeButton.onclick = () => {
       mode = (mode + 1) % 2;
       updateSlotItem();
@@ -130,6 +137,27 @@
         changeModeButton.style.display = 'inline';
       }
     };
+
+    function startSlotSpin() {
+      spinButton.disabled = true; // ボタンを無効化
+      const spinDuration = 3000; // スロットをランダムに表示する時間（ミリ秒）
+
+      let spinCounter = 0;
+      let spinInterval = setInterval(() => {
+        if (spinCounter < spinDuration) {
+          updateSlotItem();
+          spinCounter += 100; // 100ミリ秒ごとにランダムアイテムを更新
+        } else {
+          clearInterval(spinInterval);
+          spinButton.disabled = false; // ボタンを再度有効化
+        }
+      }, 100);
+
+      // 結果を表示するまでに一定時間かける
+      spinTimeout = setTimeout(() => {
+        updateSlotItem(); // 最終的な結果を表示
+      }, spinDuration);
+    }
 
     requestPermissionButton.onclick = async () => {
       if (typeof DeviceMotionEvent.requestPermission === 'function') {
