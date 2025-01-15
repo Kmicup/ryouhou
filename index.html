@@ -18,6 +18,9 @@
       color: white;
       padding: 10px;
     }
+    canvas {
+      margin-top: 20px;
+    }
     button {
       font-size: 1em;
       padding: 8px 16px;
@@ -66,37 +69,35 @@
 
   <script>
     let currentMode = 'slot'; // 'slot' or 'accelerometer'
-    let currentSlotMode = 0; // 0 = ご褒美モード, 1 = ペナルティモード
-    let audio = new Audio('alert-sound.mp3');
     let isMeasuring = false;
-    let modeItems = [
-      ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
-      ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
-    ];
-    let currentText = "";
+    let audio = new Audio('alert-sound.mp3');
+    let intervalId;
+    let lastAcceleration = { x: 0, y: 0, z: 0 };
     let canvas;
 
     function setup() {
-      canvas = createCanvas(300, 200); // スロット表示のキャンバスを作成
-      canvas.parent(document.body); // キャンバスをHTMLのbodyに紐付け
+      canvas = createCanvas(300, 200);
+      canvas.parent(document.body);
       textSize(18);
       textAlign(CENTER, CENTER);
-      updateSlotItem(); // スロットの内容を初期化
+      updateSlotItem();
     }
 
     function draw() {
       if (currentMode === 'slot') {
-        background(0); // スロットモード時の背景を黒
+        background(0); // スロットモードの背景
         fill(200);
-        rect(width / 2 - 120, height / 2 - 40, 240, 80); // スロット枠
+        rect(width / 2 - 120, height / 2 - 40, 240, 80); // スロットの枠
         fill(0);
-        text(currentText, width / 2, height / 2); // スロット内容を表示
-      } else {
-        clear(); // 加速度センサーモード時はキャンバスをクリア
+        text(currentText, width / 2, height / 2); // スロットの内容
       }
     }
 
     function updateSlotItem() {
+      const modeItems = [
+        ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
+        ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
+      ];
       let index = int(random(modeItems[currentSlotMode].length));
       currentText = modeItems[currentSlotMode][index];
     }
@@ -121,7 +122,7 @@
         document.getElementById('changeModeButton').style.display = 'none';
         document.getElementById('modeDisplay').style.display = 'none';
         document.getElementById('accelerationDisplay').style.display = 'block';
-        noLoop(); // 描画を停止
+        canvas.style.display = 'none'; // キャンバスを非表示
       } else {
         currentMode = 'slot';
         document.getElementById('toggleMode').innerText = "加速度センサーモードに切り替え";
@@ -129,19 +130,76 @@
         document.getElementById('spinButton').style.display = 'inline-block';
         document.getElementById('changeModeButton').style.display = 'inline-block';
         document.getElementById('modeDisplay').style.display = 'block';
-        loop(); // 描画を再開
+        canvas.style.display = 'block'; // キャンバスを再表示
       }
     };
+
+    document.getElementById('requestPermission').onclick = async () => {
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission === 'granted') {
+          startMeasurement();
+        } else {
+          alert('加速度センサーのアクセスが許可されていません。');
+        }
+      } else {
+        startMeasurement(); // Androidなどはそのまま開始
+      }
+    };
+
+    function startMeasurement() {
+      if (isMeasuring) return;
+      window.addEventListener('devicemotion', updateAcceleration);
+      intervalId = setInterval(() => {
+        const { x, y, z } = lastAcceleration;
+        const totalAccel = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
+        document.getElementById('accelerationX').textContent = x.toFixed(2);
+        document.getElementById('accelerationY').textContent = y.toFixed(2);
+        document.getElementById('accelerationZ').textContent = z.toFixed(2);
+        document.getElementById('totalAcceleration').textContent = totalAccel.toFixed(2);
+        if (totalAccel < 1.0) {
+          if (audio.paused) {
+            audio.play();
+          }
+        } else {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      }, 200);
+      isMeasuring = true;
+      document.getElementById('stopMeasurement').style.display = 'inline-block';
+      document.getElementById('requestPermission').style.display = 'none';
+    }
+
+    document.getElementById('stopMeasurement').onclick = () => stopMeasurement();
+
+    function stopMeasurement() {
+      clearInterval(intervalId);
+      window.removeEventListener('devicemotion', updateAcceleration);
+      audio.pause();
+      audio.currentTime = 0;
+      isMeasuring = false;
+      document.getElementById('stopMeasurement').style.display = 'none';
+      document.getElementById('requestPermission').style.display = 'inline-block';
+    }
+
+    function updateAcceleration(event) {
+      lastAcceleration = {
+        x: event.acceleration.x || 0,
+        y: event.acceleration.y || 0,
+        z: event.acceleration.z || 0
+      };
+    }
 
     function startSlotSpin() {
       let spinDuration = 3000;
       let spinCounter = 0;
       let spinInterval = setInterval(() => {
         if (spinCounter < spinDuration) {
-          updateSlotItem(); // ランダムにスロット内容を更新
+          updateSlotItem(); // スロット内容を更新
           spinCounter += 100;
         } else {
-          clearInterval(spinInterval); // スロットの回転を停止
+          clearInterval(spinInterval); // 回転を停止
         }
       }, 100);
     }
