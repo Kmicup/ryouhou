@@ -82,7 +82,7 @@
 
   <!-- スロット表示 -->
   <div class="slotContainer">
-    <div class="slot" id="slot1">スロット1</div>
+    <div class="slot" id="slot1">中ボール2個</div> <!-- 1つだけスロットを表示 -->
   </div>
 
   <!-- 加速度センサー表示 -->
@@ -159,7 +159,7 @@
     function updateSlotItem() {
       let index = int(random(modeItems[currentSlotMode].length));
       currentText = modeItems[currentSlotMode][index];
-      slot1.textContent = modeItems[currentSlotMode][index];
+      slot1.textContent = modeItems[currentSlotMode][index]; // 1つのスロットの表示を更新
     }
 
     spinButton.onclick = () => {
