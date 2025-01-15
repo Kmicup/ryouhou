@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スロット＆加速度センサー</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- p5.jsライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <style>
     body {
       display: flex;
@@ -14,7 +14,7 @@
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #111; /* 黒背景 */
+      background-color: #111;
       color: white;
       padding: 10px;
     }
@@ -38,45 +38,17 @@
       display: none;
       text-align: center;
     }
-    #title {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-      color: #f0f0f0;
-      text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
-    }
-    #modeDisplay {
-      font-size: 1.1em;
-      color: #ffcc00;
-      margin: 10px;
-    }
-    #spinButton, #changeModeButton {
-      width: 120px;
-    }
-    #canvasContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
   <h1 id="title">スロットマシン</h1>
 
-  <!-- モード切り替えボタン -->
   <button id="toggleMode">加速度センサーモードに切り替え</button>
-
-  <!-- スロットボタン -->
   <button id="spinButton">回す</button>
   <button id="changeModeButton">モード</button>
 
-  <!-- モード表示 -->
   <div id="modeDisplay">現在のモード: ご褒美モード</div>
 
-  <!-- キャンバスコンテナ -->
-  <div id="canvasContainer"></div>
-
-  <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
     <p>加速度センサー検知</p>
     <button id="requestPermission">計測開始</button>
@@ -89,103 +61,104 @@
 
   <script>
     let currentMode = 'slot'; // 'slot' or 'accelerometer'
-    let currentSlotMode = 0; // 0 = ご褒美モード, 1 = ペナルティモード
-    const threshold = 0.9;
-    let audio = new Audio('alert-sound.mp3');
-    let lastAcceleration = { x: 0, y: 0, z: 0 };
-    let intervalId;
     let isMeasuring = false;
-    let mode = 1; 
-    let modeItems = [
-      ["大きいボール", "中ボール2個", "鐘を鳴らしタイム", "ペナルティ選択", "投げる回数+1"],
-      ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
-    ];
-    let currentText = "";
-    let spinTimeout;
+    let audio = new Audio('alert-sound.mp3');
+    let intervalId;
+    let lastAcceleration = { x: 0, y: 0, z: 0 };
     let canvas;
-
-    const accelerationDisplay = document.getElementById('accelerationDisplay');
-    const requestPermissionButton = document.getElementById('requestPermission');
-    const stopMeasurementButton = document.getElementById('stopMeasurement');
-    const accelerationX = document.getElementById('accelerationX');
-    const accelerationY = document.getElementById('accelerationY');
-    const accelerationZ = document.getElementById('accelerationZ');
-    const totalAcceleration = document.getElementById('totalAcceleration');
-    const toggleModeButton = document.getElementById('toggleMode');
-    const spinButton = document.getElementById('spinButton');
-    const changeModeButton = document.getElementById('changeModeButton');
-    const modeDisplay = document.getElementById('modeDisplay');
-    const title = document.getElementById('title');
 
     function setup() {
       canvas = createCanvas(300, 200);
-      canvas.parent('canvasContainer'); // キャンバスをHTML要素に紐付け
+      canvas.parent(document.body);
       textSize(18);
       textAlign(CENTER, CENTER);
-      updateSlotItem();
     }
 
     function draw() {
-      clear(); // キャンバスをリセット
+      clear();
       if (currentMode === 'slot') {
-        background(0); // 夜空の背景
-        fill(200);
-        rect(width / 2 - 120, height / 2 - 40, 240, 80);
-        fill(0);
-        text(currentText, width / 2, height / 2); // スロット内容
+        background(0);
+        fill(255);
+        text("スロット描画", width / 2, height / 2);
       }
     }
 
-    function updateSlotItem() {
-      let index = int(random(modeItems[currentSlotMode].length));
-      currentText = modeItems[currentSlotMode][index];
-    }
-
-    spinButton.onclick = () => {
-      if (currentMode === 'slot') {
-        startSlotSpin();
-      }
-    };
-
-    changeModeButton.onclick = () => {
-      currentSlotMode = (currentSlotMode + 1) % 2;
-      updateSlotItem();
-      modeDisplay.textContent = `現在のモード: ${currentSlotMode === 0 ? 'ご褒美モード' : 'ペナルティモード'}`;
-    };
-
-    toggleModeButton.onclick = () => {
+    // 加速度センサーモードの切り替え
+    document.getElementById('toggleMode').onclick = () => {
       if (currentMode === 'slot') {
         currentMode = 'accelerometer';
-        toggleModeButton.innerText = "スロットモードに切り替え";
-        spinButton.style.display = 'none';
-        changeModeButton.style.display = 'none';
-        modeDisplay.style.display = 'none';
-        accelerationDisplay.style.display = 'block';
-        canvas.style('display', 'none'); // キャンバスを非表示
+        document.getElementById('toggleMode').innerText = "スロットモードに切り替え";
+        document.getElementById('spinButton').style.display = 'none';
+        document.getElementById('changeModeButton').style.display = 'none';
+        document.getElementById('modeDisplay').style.display = 'none';
+        document.getElementById('accelerationDisplay').style.display = 'block';
+        noLoop(); // 描画を停止
       } else {
         currentMode = 'slot';
-        toggleModeButton.innerText = "加速度センサーモードに切り替え";
-        accelerationDisplay.style.display = 'none';
-        spinButton.style.display = 'inline';
-        changeModeButton.style.display = 'inline';
-        modeDisplay.style.display = 'block';
-        canvas.style('display', 'block'); // キャンバスを再表示
+        document.getElementById('toggleMode').innerText = "加速度センサーモードに切り替え";
+        document.getElementById('accelerationDisplay').style.display = 'none';
+        document.getElementById('spinButton').style.display = 'inline-block';
+        document.getElementById('changeModeButton').style.display = 'inline-block';
+        document.getElementById('modeDisplay').style.display = 'block';
+        loop(); // 描画を再開
       }
     };
 
-    function startSlotSpin() {
-      spinButton.disabled = true;
-      const spinDuration = 3000;
-      let spinCounter = 0;
-      let spinInterval = setInterval(() => {
-        if (spinCounter < spinDuration) {
-          updateSlotItem();
-          spinCounter += 100;
+    document.getElementById('requestPermission').onclick = async () => {
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission === 'granted') {
+          startMeasurement();
         } else {
-          clearInterval(spinInterval);
-          spinButton.disabled = false;
+          alert('加速度センサーのアクセスが許可されていません。');
         }
-      }, 100);
+      } else {
+        startMeasurement(); // Androidなどはそのまま開始
+      }
+    };
+
+    function startMeasurement() {
+      if (isMeasuring) return;
+      window.addEventListener('devicemotion', updateAcceleration);
+      intervalId = setInterval(() => {
+        const { x, y, z } = lastAcceleration;
+        const totalAccel = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
+        document.getElementById('accelerationX').textContent = x.toFixed(2);
+        document.getElementById('accelerationY').textContent = y.toFixed(2);
+        document.getElementById('accelerationZ').textContent = z.toFixed(2);
+        document.getElementById('totalAcceleration').textContent = totalAccel.toFixed(2);
+        if (totalAccel < 1.0) {
+          if (audio.paused) {
+            audio.play();
+          }
+        } else {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      }, 200);
+      isMeasuring = true;
+      document.getElementById('stopMeasurement').style.display = 'inline-block';
+      document.getElementById('requestPermission').style.display = 'none';
+    }
+
+    document.getElementById('stopMeasurement').onclick = () => stopMeasurement();
+
+    function stopMeasurement() {
+      clearInterval(intervalId);
+      window.removeEventListener('devicemotion', updateAcceleration);
+      audio.pause();
+      audio.currentTime = 0;
+      isMeasuring = false;
+      document.getElementById('stopMeasurement').style.display = 'none';
+      document.getElementById('requestPermission').style.display = 'inline-block';
+    }
+
+    function updateAcceleration(event) {
+      lastAcceleration = {
+        x: event.acceleration.x || 0,
+        y: event.acceleration.y || 0,
+        z: event.acceleration.z || 0
+      };
     }
   </script>
 </body>
