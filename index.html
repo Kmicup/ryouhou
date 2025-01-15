@@ -46,6 +46,11 @@
       color: #f0f0f0;
       text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
     }
+    #modeDisplay {
+      font-size: 1.5em;
+      color: #ffcc00;
+      margin: 20px;
+    }
   </style>
 </head>
 <body>
@@ -57,6 +62,9 @@
   <!-- スロットボタン -->
   <button id="spinButton">回す</button>
   <button id="changeModeButton">モード</button>
+
+  <!-- モード表示 -->
+  <div id="modeDisplay">現在のモード: ご褒美モード</div>
 
   <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
@@ -71,6 +79,7 @@
 
   <script>
     let currentMode = 'slot'; // 'slot' or 'accelerometer'
+    let currentSlotMode = 0; // 0 = ご褒美モード, 1 = ペナルティモード
     const threshold = 0.9;
     let audio = new Audio('alert-sound.mp3');
     let lastAcceleration = { x: 0, y: 0, z: 0 };
@@ -94,6 +103,7 @@
     const toggleModeButton = document.getElementById('toggleMode');
     const spinButton = document.getElementById('spinButton');
     const changeModeButton = document.getElementById('changeModeButton');
+    const modeDisplay = document.getElementById('modeDisplay');
     const title = document.getElementById('title');
 
     function setup() {
@@ -125,8 +135,8 @@
     }
 
     function updateSlotItem() {
-      let index = int(random(modeItems[mode].length));
-      currentText = modeItems[mode][index];
+      let index = int(random(modeItems[currentSlotMode].length));
+      currentText = modeItems[currentSlotMode][index];
     }
 
     spinButton.onclick = () => {
@@ -136,8 +146,9 @@
     };
 
     changeModeButton.onclick = () => {
-      mode = (mode + 1) % 2;
+      currentSlotMode = (currentSlotMode + 1) % 2;  // モードを切り替え
       updateSlotItem();
+      modeDisplay.textContent = `現在のモード: ${currentSlotMode === 0 ? 'ご褒美モード' : 'ペナルティモード'}`;
     };
 
     // モード切り替え
