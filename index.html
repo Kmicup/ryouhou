@@ -18,16 +18,13 @@
       color: white;
       padding: 10px;
     }
-    canvas {
-      margin-top: 20px;
-    }
     button {
-      font-size: 1em; /* 小さく */
-      padding: 8px 16px; /* ボタンの幅を小さく */
+      font-size: 1em;
+      padding: 8px 16px;
       margin: 8px;
-      border-radius: 8px; /* 角を丸く */
+      border-radius: 8px;
       cursor: pointer;
-      background: linear-gradient(45deg, #00aaff, #ffcc00); /* 青と黄色のグラデーション */
+      background: linear-gradient(45deg, #00aaff, #ffcc00);
       border: none;
       color: black;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
@@ -42,35 +39,24 @@
       text-align: center;
     }
     #title {
-      font-size: 1.5em; /* 小さく */
+      font-size: 1.5em;
       margin-bottom: 10px;
       color: #f0f0f0;
       text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
     }
     #modeDisplay {
-      font-size: 1.1em;  /* モード表示を小さく */
+      font-size: 1.1em;
       color: #ffcc00;
       margin: 10px;
     }
     #spinButton, #changeModeButton {
-      width: 120px; /* ボタンの幅を小さく */
+      width: 120px;
     }
-    .slotContainer {
+    #canvasContainer {
       display: flex;
       justify-content: center;
       align-items: center;
       margin-top: 10px;
-    }
-    .slot {
-      font-size: 1.5em; /* スロットのテキストを小さく */
-      margin: 0 10px;
-      width: 150px; /* スロットの幅を調整 */
-      height: 100px;
-      background-color: gray; /* 背景色 */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
     }
   </style>
 </head>
@@ -87,10 +73,8 @@
   <!-- モード表示 -->
   <div id="modeDisplay">現在のモード: ご褒美モード</div>
 
-  <!-- スロット表示 -->
-  <div class="slotContainer" id="slotContainer">
-    <div class="slot" id="slot1">中ボール2個</div> <!-- 1つだけスロットを表示 -->
-  </div>
+  <!-- キャンバスコンテナ -->
+  <div id="canvasContainer"></div>
 
   <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
@@ -117,7 +101,8 @@
       ["禁止マス", "全員ケンケン", "避け手の範囲拡大", "避ける範囲縮小", "一人動けない"]
     ];
     let currentText = "";
-    let spinTimeout; // スロットの回転に関するタイマー
+    let spinTimeout;
+    let canvas;
 
     const accelerationDisplay = document.getElementById('accelerationDisplay');
     const requestPermissionButton = document.getElementById('requestPermission');
@@ -131,45 +116,29 @@
     const changeModeButton = document.getElementById('changeModeButton');
     const modeDisplay = document.getElementById('modeDisplay');
     const title = document.getElementById('title');
-    const slot1 = document.getElementById('slot1');
-    const slotContainer = document.getElementById('slotContainer'); // 追加
 
     function setup() {
-      createCanvas(300, 200); // コンパクトなサイズに設定
-      textSize(18); // 文字サイズを調整
+      canvas = createCanvas(300, 200);
+      canvas.parent('canvasContainer'); // キャンバスをHTML要素に紐付け
+      textSize(18);
       textAlign(CENTER, CENTER);
       updateSlotItem();
     }
 
     function draw() {
+      clear(); // キャンバスをリセット
       if (currentMode === 'slot') {
-        // スロットモードの場合、スロットを表示
         background(0); // 夜空の背景
         fill(200);
-        rect(width / 2 - 120, height / 2 - 40, 240, 80); // 小さめのスロット矩形
+        rect(width / 2 - 120, height / 2 - 40, 240, 80);
         fill(0);
         text(currentText, width / 2, height / 2); // スロット内容
-
-        title.innerText = "スロットマシン";
-        spinButton.style.display = 'inline';
-        changeModeButton.style.display = 'inline';
-        modeDisplay.style.display = 'block'; // モード表示を表示
-        accelerationDisplay.style.display = 'none';
-        slotContainer.style.display = 'block'; // スロットコンテナを表示
-      } else {
-        // 加速度センサーモードの場合、スロットを非表示にする
-        spinButton.style.display = 'none';  // スロットボタン非表示
-        changeModeButton.style.display = 'none'; // モード切り替えボタン非表示
-        modeDisplay.style.display = 'none'; // モード表示を非表示
-        accelerationDisplay.style.display = 'block'; // 加速度センサー表示
-        slotContainer.style.display = 'none'; // スロットコンテナを非表示
       }
     }
 
     function updateSlotItem() {
       let index = int(random(modeItems[currentSlotMode].length));
       currentText = modeItems[currentSlotMode][index];
-      slot1.textContent = modeItems[currentSlotMode][index]; // 1つのスロットの表示を更新
     }
 
     spinButton.onclick = () => {
@@ -179,116 +148,44 @@
     };
 
     changeModeButton.onclick = () => {
-      currentSlotMode = (currentSlotMode + 1) % 2;  // モードを切り替え
+      currentSlotMode = (currentSlotMode + 1) % 2;
       updateSlotItem();
       modeDisplay.textContent = `現在のモード: ${currentSlotMode === 0 ? 'ご褒美モード' : 'ペナルティモード'}`;
     };
 
-    // モード切り替え
     toggleModeButton.onclick = () => {
       if (currentMode === 'slot') {
         currentMode = 'accelerometer';
         toggleModeButton.innerText = "スロットモードに切り替え";
         spinButton.style.display = 'none';
         changeModeButton.style.display = 'none';
-        modeDisplay.style.display = 'none'; // 加速度センサーの時にはスロットとモード表示を非表示
+        modeDisplay.style.display = 'none';
         accelerationDisplay.style.display = 'block';
-        slotContainer.style.display = 'none'; // スロットも非表示
+        canvas.style('display', 'none'); // キャンバスを非表示
       } else {
         currentMode = 'slot';
         toggleModeButton.innerText = "加速度センサーモードに切り替え";
         accelerationDisplay.style.display = 'none';
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
-        modeDisplay.style.display = 'block'; // スロットとモード表示を再表示
-        slotContainer.style.display = 'block'; // スロットを再表示
-      }
-    };
-
-    requestPermissionButton.onclick = async () => {
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // iOSの場合、加速度センサーの許可を求める
-        const permission = await DeviceMotionEvent.requestPermission();
-        if (permission === 'granted') {
-          startMeasurement();
-        } else {
-          alert('加速度センサーのアクセスが許可されていません。');
-        }
-      } else {
-        startMeasurement(); // Androidなど、すでに許可されている場合
+        modeDisplay.style.display = 'block';
+        canvas.style('display', 'block'); // キャンバスを再表示
       }
     };
 
     function startSlotSpin() {
-      spinButton.disabled = true; // ボタンを無効化
-      const spinDuration = 3000; // スロットをランダムに表示する時間（ミリ秒）
-
+      spinButton.disabled = true;
+      const spinDuration = 3000;
       let spinCounter = 0;
       let spinInterval = setInterval(() => {
         if (spinCounter < spinDuration) {
           updateSlotItem();
-          spinCounter += 100; // 100ミリ秒ごとにランダムアイテムを更新
+          spinCounter += 100;
         } else {
           clearInterval(spinInterval);
-          spinButton.disabled = false; // ボタンを再度有効化
+          spinButton.disabled = false;
         }
       }, 100);
-
-      // 結果を表示するまでに一定時間かける
-      spinTimeout = setTimeout(() => {
-        updateSlotItem(); // 最終的な結果を表示
-      }, spinDuration);
-    }
-
-    function startMeasurement() {
-      setTimeout(() => {
-        if (isMeasuring) return;
-        window.addEventListener('devicemotion', updateAcceleration);
-        intervalId = setInterval(() => {
-          const x = lastAcceleration.x;
-          const y = lastAcceleration.y;
-          const z = lastAcceleration.z;
-          const totalAccel = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
-
-          accelerationX.textContent = x.toFixed(2);
-          accelerationY.textContent = y.toFixed(2);
-          accelerationZ.textContent = z.toFixed(2);
-          totalAcceleration.textContent = totalAccel.toFixed(2);
-
-          // 総合加速度が1.0未満なら音を鳴らし、それ以外の場合は音を止める
-          if (totalAccel < 1.0) {
-            if (audio.paused) {
-              audio.play();
-            }
-          } else {
-            audio.pause();
-            audio.currentTime = 0;
-          }
-        }, 200);
-        isMeasuring = true;
-        stopMeasurementButton.style.display = 'inline';
-      }, 2000); // 2秒後に計測開始
-      requestPermissionButton.style.display = 'none';
-    }
-
-    stopMeasurementButton.onclick = () => stopMeasurement();
-
-    function updateAcceleration(event) {
-      lastAcceleration = {
-        x: event.acceleration.x || 0,
-        y: event.acceleration.y || 0,
-        z: event.acceleration.z || 0
-      };
-    }
-
-    function stopMeasurement() {
-      if (intervalId) clearInterval(intervalId);
-      window.removeEventListener('devicemotion', updateAcceleration);
-      audio.pause();
-      audio.currentTime = 0;
-      isMeasuring = false;
-      stopMeasurementButton.style.display = 'none';
-      requestPermissionButton.style.display = 'inline';
     }
   </script>
 </body>
