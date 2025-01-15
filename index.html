@@ -154,12 +154,14 @@
         changeModeButton.style.display = 'inline';
         modeDisplay.style.display = 'block'; // モード表示を表示
         accelerationDisplay.style.display = 'none';
+        slot1.style.display = 'block'; // スロットを表示
       } else {
         // 加速度センサーモードの場合、スロットを非表示にする
         spinButton.style.display = 'none';  // スロットボタン非表示
         changeModeButton.style.display = 'none'; // モード切り替えボタン非表示
         modeDisplay.style.display = 'none'; // モード表示を非表示
         accelerationDisplay.style.display = 'block'; // 加速度センサー表示
+        slot1.style.display = 'none'; // スロットを非表示
       }
     }
 
@@ -190,6 +192,7 @@
         changeModeButton.style.display = 'none';
         modeDisplay.style.display = 'none'; // 加速度センサーの時にはスロットとモード表示を非表示
         accelerationDisplay.style.display = 'block';
+        slot1.style.display = 'none'; // スロットも非表示
       } else {
         currentMode = 'slot';
         toggleModeButton.innerText = "加速度センサーモードに切り替え";
@@ -197,6 +200,7 @@
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
         modeDisplay.style.display = 'block'; // スロットとモード表示を再表示
+        slot1.style.display = 'block'; // スロットを再表示
       }
     };
 
