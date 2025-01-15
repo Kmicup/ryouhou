@@ -16,15 +16,16 @@
       font-family: Arial, sans-serif;
       background-color: #111; /* 黒背景 */
       color: white;
+      padding: 10px;
     }
     canvas {
       margin-top: 20px;
     }
     button {
-      font-size: 1.2em;
-      padding: 12px 20px;
-      margin: 10px;
-      border-radius: 10px;
+      font-size: 1em; /* 小さく */
+      padding: 8px 16px; /* ボタンの幅を小さく */
+      margin: 8px;
+      border-radius: 8px; /* 角を丸く */
       cursor: pointer;
       background: linear-gradient(45deg, #00aaff, #ffcc00); /* 青と黄色のグラデーション */
       border: none;
@@ -41,15 +42,28 @@
       text-align: center;
     }
     #title {
-      font-size: 2em;
-      margin-bottom: 20px;
+      font-size: 1.5em; /* 小さく */
+      margin-bottom: 10px;
       color: #f0f0f0;
       text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
     }
     #modeDisplay {
-      font-size: 1.2em;  /* モード表示を小さく */
+      font-size: 1.1em;  /* モード表示を小さく */
       color: #ffcc00;
-      margin: 20px;
+      margin: 10px;
+    }
+    #spinButton, #changeModeButton {
+      width: 120px; /* ボタンの幅を小さく */
+    }
+    .slotContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .slot {
+      font-size: 1.5em; /* スロットのテキストを小さく */
+      margin: 0 10px;
     }
   </style>
 </head>
@@ -65,6 +79,13 @@
 
   <!-- モード表示 -->
   <div id="modeDisplay">現在のモード: ご褒美モード</div>
+
+  <!-- スロット表示 -->
+  <div class="slotContainer">
+    <div class="slot" id="slot1">スロット1</div>
+    <div class="slot" id="slot2">スロット2</div>
+    <div class="slot" id="slot3">スロット3</div>
+  </div>
 
   <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
@@ -105,6 +126,9 @@
     const changeModeButton = document.getElementById('changeModeButton');
     const modeDisplay = document.getElementById('modeDisplay');
     const title = document.getElementById('title');
+    const slot1 = document.getElementById('slot1');
+    const slot2 = document.getElementById('slot2');
+    const slot3 = document.getElementById('slot3');
 
     function setup() {
       createCanvas(300, 200); // コンパクトなサイズに設定
@@ -139,6 +163,9 @@
     function updateSlotItem() {
       let index = int(random(modeItems[currentSlotMode].length));
       currentText = modeItems[currentSlotMode][index];
+      slot1.textContent = modeItems[currentSlotMode][index];
+      slot2.textContent = modeItems[currentSlotMode][index];
+      slot3.textContent = modeItems[currentSlotMode][index];
     }
 
     spinButton.onclick = () => {
