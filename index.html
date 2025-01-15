@@ -47,7 +47,7 @@
       text-shadow: 0 0 5px rgba(0, 0, 255, 0.7), 0 0 10px rgba(0, 0, 255, 0.7);
     }
     #modeDisplay {
-      font-size: 1.5em;
+      font-size: 1.2em;  /* モード表示を小さく */
       color: #ffcc00;
       margin: 20px;
     }
@@ -125,11 +125,13 @@
         title.innerText = "スロットマシン";
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
+        modeDisplay.style.display = 'block'; // モード表示を表示
         accelerationDisplay.style.display = 'none';
       } else {
         // 加速度センサーモードの場合、スロットを非表示にする
         spinButton.style.display = 'none';  // スロットボタン非表示
         changeModeButton.style.display = 'none'; // モード切り替えボタン非表示
+        modeDisplay.style.display = 'none'; // モード表示を非表示
         accelerationDisplay.style.display = 'block'; // 加速度センサー表示
       }
     }
@@ -158,6 +160,7 @@
         toggleModeButton.innerText = "スロットモードに切り替え";
         spinButton.style.display = 'none';
         changeModeButton.style.display = 'none';
+        modeDisplay.style.display = 'none'; // 加速度センサーの時にはスロットとモード表示を非表示
         accelerationDisplay.style.display = 'block';
       } else {
         currentMode = 'slot';
@@ -165,6 +168,7 @@
         accelerationDisplay.style.display = 'none';
         spinButton.style.display = 'inline';
         changeModeButton.style.display = 'inline';
+        modeDisplay.style.display = 'block'; // スロットとモード表示を再表示
       }
     };
 
