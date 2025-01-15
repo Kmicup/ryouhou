@@ -43,12 +43,17 @@
 <body>
   <h1 id="title">スロットマシン</h1>
 
+  <!-- モード切り替えボタン -->
   <button id="toggleMode">加速度センサーモードに切り替え</button>
+
+  <!-- スロットボタン -->
   <button id="spinButton">回す</button>
   <button id="changeModeButton">モード</button>
 
+  <!-- モード表示 -->
   <div id="modeDisplay">現在のモード: ご褒美モード</div>
 
+  <!-- 加速度センサー表示 -->
   <div id="accelerationDisplay">
     <p>加速度センサー検知</p>
     <button id="requestPermission">計測開始</button>
@@ -77,13 +82,24 @@
     function draw() {
       clear();
       if (currentMode === 'slot') {
-        background(0);
+        background(0); // スロットモード時の背景
         fill(255);
-        text("スロット描画", width / 2, height / 2);
+        text("スロット描画", width / 2, height / 2); // スロット描画の内容
+      } else {
+        clear(); // 加速度センサーモード時は描画をクリア
       }
     }
 
-    // 加速度センサーモードの切り替え
+    document.getElementById('spinButton').onclick = () => {
+      if (currentMode === 'slot') {
+        startSlotSpin();
+      }
+    };
+
+    document.getElementById('changeModeButton').onclick = () => {
+      alert("モードを切り替えました！");
+    };
+
     document.getElementById('toggleMode').onclick = () => {
       if (currentMode === 'slot') {
         currentMode = 'accelerometer';
@@ -159,6 +175,19 @@
         y: event.acceleration.y || 0,
         z: event.acceleration.z || 0
       };
+    }
+
+    function startSlotSpin() {
+      let spinDuration = 3000;
+      let spinCounter = 0;
+
+      let spinInterval = setInterval(() => {
+        if (spinCounter < spinDuration) {
+          spinCounter += 100;
+        } else {
+          clearInterval(spinInterval);
+        }
+      }, 100);
     }
   </script>
 </body>
