@@ -83,8 +83,6 @@
   <!-- スロット表示 -->
   <div class="slotContainer">
     <div class="slot" id="slot1">スロット1</div>
-    <div class="slot" id="slot2">スロット2</div>
-    <div class="slot" id="slot3">スロット3</div>
   </div>
 
   <!-- 加速度センサー表示 -->
@@ -127,8 +125,6 @@
     const modeDisplay = document.getElementById('modeDisplay');
     const title = document.getElementById('title');
     const slot1 = document.getElementById('slot1');
-    const slot2 = document.getElementById('slot2');
-    const slot3 = document.getElementById('slot3');
 
     function setup() {
       createCanvas(300, 200); // コンパクトなサイズに設定
@@ -164,8 +160,6 @@
       let index = int(random(modeItems[currentSlotMode].length));
       currentText = modeItems[currentSlotMode][index];
       slot1.textContent = modeItems[currentSlotMode][index];
-      slot2.textContent = modeItems[currentSlotMode][index];
-      slot3.textContent = modeItems[currentSlotMode][index];
     }
 
     spinButton.onclick = () => {
